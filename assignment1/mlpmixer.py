@@ -76,8 +76,10 @@ class MixerBlock(nn.Module):
         self.mlp_channels = Mlp(dim, channels_dim, act_layer=act_layer, drop=drop)
 
     def forward(self, x):
-        x_token = self.norm1(x).permute(0, 2, 1)
-        x_token = self.mlp_tokens(x_token).permute(0, 2, 1)
+        x_token = self.norm1(x)
+        x_token = x_token.permute(0, 2, 1)
+        x_token = self.mlp_tokens(x_token)
+        x_token = x_token.permute(0, 2, 1)
         x_channel = self.norm2(x + x_token)
         x_channel = self.mlp_channels(x_channel)
         return x_channel + x_token + x
