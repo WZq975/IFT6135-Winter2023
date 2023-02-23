@@ -7,7 +7,6 @@ Reference:
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.tensorboard import SummaryWriter
 import os
 
 
@@ -78,13 +77,13 @@ class ResNet18(nn.Module):
         out = self.linear(out)
         return out
 
-    def visualize(self, logdir):
-        """ Visualize the kernel in the desired directory """
-        for name, param in self.named_parameters():
-            if 'conv' in name:
-                writer = SummaryWriter(log_dir=logdir)
-                writer.add_histogram(name, param.clone().cpu().data.numpy(), 0)
-                writer.close()
+#     def visualize(self, logdir):
+#         """ Visualize the kernel in the desired directory """
+#         for name, param in self.named_parameters():
+#             if 'conv' in name:
+#                 writer = SummaryWriter(log_dir=logdir)
+#                 writer.add_histogram(name, param.clone().cpu().data.numpy(), 0)
+#                 writer.close()
 
 
 
