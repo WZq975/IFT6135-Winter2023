@@ -3,7 +3,6 @@ import torch
 import math
 import matplotlib.pyplot as plt
 import os
-from torch.utils.tensorboard import SummaryWriter
 
 
 class PatchEmbed(nn.Module):
@@ -132,16 +131,16 @@ class MLPMixer(nn.Module):
         x = self.head(x)
         return x
     
-    def visualize(self, logdir):
-        """ Visualize the token mixer layer 
-        in the desired directory """
-        writer = SummaryWriter(logdir)
-        sample_input = torch.randn(1, 3, self.img_size, self.img_size)
-        # mix_layer = self.blocks[0].mlp_tokens
-        activations = self.blocks[0].mlp_tokens(self.blocks[0].norm1(self.patchemb(sample_input)).permute(0, 2, 1))
-        activations = activations.permute(0, 2, 1)
-        writer.add_histogram("Token Mixer Activations", activations, global_step=0)
-        writer.close()
+#     def visualize(self, logdir):
+#         """ Visualize the token mixer layer 
+#         in the desired directory """
+#         writer = SummaryWriter(logdir)
+#         sample_input = torch.randn(1, 3, self.img_size, self.img_size)
+#         # mix_layer = self.blocks[0].mlp_tokens
+#         activations = self.blocks[0].mlp_tokens(self.blocks[0].norm1(self.patchemb(sample_input)).permute(0, 2, 1))
+#         activations = activations.permute(0, 2, 1)
+#         writer.add_histogram("Token Mixer Activations", activations, global_step=0)
+#         writer.close()
 
 
 
