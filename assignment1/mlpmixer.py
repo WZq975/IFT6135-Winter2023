@@ -122,9 +122,7 @@ class MLPMixer(nn.Module):
         # step1: Go through the patch embedding
         x = self.patchemb(images)
         # step 2 Go through the mixer blocks
-        print(x.shape)
         x = self.blocks(x)
-        print(x.shape)
         # step 3 go through layer norm
         x = self.norm(x)
         # step 4 Global averaging spatially
