@@ -8,6 +8,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import os
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class BasicBlock(nn.Module):
@@ -77,13 +79,23 @@ class ResNet18(nn.Module):
         out = self.linear(out)
         return out
 
-#     def visualize(self, logdir):
-#         """ Visualize the kernel in the desired directory """
-#         for name, param in self.named_parameters():
-#             if 'conv' in name:
-#                 writer = SummaryWriter(log_dir=logdir)
-#                 writer.add_histogram(name, param.clone().cpu().data.numpy(), 0)
-#                 writer.close()
+    def visualize(self, logdir):
+        """ Visualize the kernel in the desired directory """
+        # Get the weight tensor of the first convolutional layer
+        weight = self.conv1.weight.detach().cpu().numpy()
 
+        # Standardize the weights
+        weight = (weight - np.mean(weight)) / np.std(weight)
+
+        # Convert each kernel to a grayscale image by averaging the RGB channels
+        weight = np.mean(weight, axis=1)
+
+        # Plot each kernel as a 3x3 image
+        fig, axs = plt.subplots(8, 8, figsize=(10, 10))
+        for i in range(8):
+            for j in range(8):
+                axs[i, j].imshow(weight[i * 8 + j], cmap='gray')
+                axs[i, j].axis('off')
+        plt.show()
 
 

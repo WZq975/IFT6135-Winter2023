@@ -3,7 +3,7 @@ import torch
 import math
 import matplotlib.pyplot as plt
 import os
-
+import numpy as np
 
 class PatchEmbed(nn.Module):
     """ 2D Image to Patch Embedding
@@ -28,6 +28,7 @@ class PatchEmbed(nn.Module):
         assert H == self.img_size, f"Input image height ({H}) doesn't match model ({self.img_size})."
         assert W == self.img_size, f"Input image width ({W}) doesn't match model ({self.img_size})."
         x = self.proj(x)
+
         x = x.flatten(2).transpose(1, 2)  # BCHW -> BNC
         return x
 
@@ -132,18 +133,24 @@ class MLPMixer(nn.Module):
         x = self.head(x)
         return x
     
-#     def visualize(self, logdir):
-#         """ Visualize the token mixer layer 
-#         in the desired directory """
-#         writer = SummaryWriter(logdir)
-#         sample_input = torch.randn(1, 3, self.img_size, self.img_size)
-#         # mix_layer = self.blocks[0].mlp_tokens
-#         activations = self.blocks[0].mlp_tokens(self.blocks[0].norm1(self.patchemb(sample_input)).permute(0, 2, 1))
-#         activations = activations.permute(0, 2, 1)
-#         writer.add_histogram("Token Mixer Activations", activations, global_step=0)
-#         writer.close()
+    def visualize(self, logdir):
+        """ Visualize the token mixer layer 
+        in the desired directory """
+        # Extract the weight tensor
+        weights = self.blocks[0].mlp_tokens.fc1.weight.detach().cpu().numpy()
 
+        # Standardize the weights
+        weights = (weights - np.mean(weights)) / np.std(weights)
 
+        weights = weights.reshape(128, 8, 8)
+
+        # Plot the weights
+        fig, axs = plt.subplots(8, 16, figsize=(20, 10))
+        for i in range(8):
+            for j in range(16):
+                axs[i, j].imshow(weights[i * 16 + j], cmap='gray')
+                axs[i, j].axis('off')
+        plt.show()
 
 
 

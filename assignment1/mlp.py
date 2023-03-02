@@ -43,7 +43,7 @@ class MLP(torch.nn.Module):
         assert len(hidden_sizes) > 1, "You should at least have one hidden layer"
         self.num_classes = num_classes
         self.activation = activation
-        # assert activation in ['tanh', 'relu', 'sigmoid'], "Invalid choice of activation"
+        assert activation in ['tanh', 'relu', 'sigmoid'], "Invalid choice of activation"
         self.hidden_layers, self.output_layer = self._build_layers(input_size, hidden_sizes, num_classes)
         
         # Initializaton
