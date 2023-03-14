@@ -58,8 +58,7 @@ class GRU(nn.Module):
         batch_size, seq_len, _ = inputs.size()
         outputs = []
         if hidden_states is None:
-            ht = torch.zeros((batch_size, self.hidden_size),
-                                        dtype=torch.float, device=next(self.parameters()).device)
+            ht = torch.zeros((batch_size, self.hidden_size), device=next(self.parameters()).device)
         else:
             ht = hidden_states.squeeze(0)  # (batch_size, hidden_size)
 
@@ -68,7 +67,7 @@ class GRU(nn.Module):
 
             rt = torch.sigmoid(torch.mm(xt, self.w_ir.t()) + self.b_ir + torch.mm(ht, self.w_hr.t()) + self.b_hr)
             zt = torch.sigmoid(torch.mm(xt, self.w_iz.t()) + self.b_iz + torch.mm(ht, self.w_hz.t()) + self.b_hz)
-            nt = torch.tanh(torch.mm(xt, self.w_in.t()) + self.b_in + rt * torch.mm(ht, self.w_hn.t()) + self.b_hn)
+            nt = torch.tanh(torch.mm(xt, self.w_in.t()) + self.b_in + rt * (torch.mm(ht, self.w_hn.t()) + self.b_hn))
             ht = (1 - zt) * nt + zt * ht
 
             outputs.append(ht.unsqueeze(1))
