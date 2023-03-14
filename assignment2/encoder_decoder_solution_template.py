@@ -32,7 +32,7 @@ class GRU(nn.Module):
         for param in self.parameters():
             nn.init.uniform_(param, a=-(1/hidden_size)**0.5, b=(1/hidden_size)**0.5)
 
-    def forward(self, inputs, hidden_states):
+    def forward(self, inputs, hidden_states=None):
         """GRU.
 
         This is a Gated Recurrent Unit
@@ -55,17 +55,21 @@ class GRU(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        _, seq_len, _ = inputs.size()
+        batch_size, seq_len, _ = inputs.size()
         outputs = []
-        ht = hidden_states.squeeze(0)  # (batch_size, hidden_size)
+        if hidden_states is None:
+            ht = torch.zeros((batch_size, self.hidden_size),
+                                        dtype=torch.float, device=next(self.parameters()).device)
+        else:
+            ht = hidden_states.squeeze(0)  # (batch_size, hidden_size)
 
         for t in range(seq_len):
             xt = inputs[:, t, :]  # (batch_size, input_size)
 
-            rt = torch.sigmoid(torch.mm(ht, self.w_hr.t()) + self.b_ir + torch.mm(xt, self.w_ir.t()) + self.b_hr)
-            zt = torch.sigmoid(torch.mm(ht, self.w_hz.t()) + self.b_iz + torch.mm(xt, self.w_iz.t()) + self.b_hz)
+            rt = torch.sigmoid(torch.mm(xt, self.w_ir.t()) + self.b_ir + torch.mm(ht, self.w_hr.t()) + self.b_hr)
+            zt = torch.sigmoid(torch.mm(xt, self.w_iz.t()) + self.b_iz + torch.mm(ht, self.w_hz.t()) + self.b_hz)
             nt = torch.tanh(torch.mm(xt, self.w_in.t()) + self.b_in + rt * torch.mm(ht, self.w_hn.t()) + self.b_hn)
-            ht = (1 - zt) * ht + zt * nt
+            ht = (1 - zt) * nt + zt * ht
 
             outputs.append(ht.unsqueeze(1))
 

@@ -162,6 +162,7 @@ class MultiHeadedAttention(nn.Module):
         # ==========================
         attention_weights = self.get_attention_weights(queries, keys, mask)
         attended_values = torch.matmul(attention_weights, values)
+        attended_values = self.merge_heads(attended_values)
         return attended_values
 
 
@@ -193,7 +194,7 @@ class MultiHeadedAttention(nn.Module):
         # TODO: Write your code here
         # ==========================
         batch_size, sequence_length, _ = tensor.size()
-        tensor = tensor.view(batch_size, sequence_length, self.num_heads, self.head_size)
+        tensor = tensor.view(batch_size, sequence_length, self.num_heads, -1)
         tensor = tensor.transpose(1, 2).contiguous()
         return tensor
 
@@ -276,7 +277,6 @@ class MultiHeadedAttention(nn.Module):
         keys = self.split_heads(keys)
         values = self.split_heads(values)
         attended_values = self.apply_attention(queries, keys, values, mask)
-        attended_values = self.merge_heads(attended_values)  # (batch_size, sequence_length, num_heads * head_size)
         outputs = self.linear_out(attended_values)
         return outputs
 
